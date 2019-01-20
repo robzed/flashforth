@@ -1946,7 +1946,7 @@ RQ_STKUNF:
         btfss   1, STKUNF, A
 #endif 
         bra     RQ_BOR
-        rcall   XSQUOTE
+        call    XSQUOTE
         db      d'1',"U"
         rcall   TYPE
 RQ_BOR:
@@ -2359,10 +2359,19 @@ WARM_ZERO_1:
         bnz     WARM_ZERO_1
 #endif
 
-        setf    ibase_hi, A     ; Mark flash buffer empty
+        setf    ibase_hi, A           ; Mark flash buffer empty
 
-        lfsr    Sptr, (usbuf-1) ; Initalise Parameter stack
-        lfsr    Rptr, urbuf
+        ;lfsr    Tptr, (usbuf-1)       ; Initalise Parameter stack
+        movlw   low(usbuf-1)
+        movwf   Sp
+        movlw   high(usbuf-1)
+        movwf   Sbank
+        ;lfsr    Rptr, urbuf           
+        movlw   low(urbuf)
+        movwf   Rp
+        movlw   high(urbuf)
+        movwf   Rbank
+
         banksel PIE1            
 #ifdef PIE0                     ; Disable all peripheral interrupts
         clrf    PIE0, BANKED
@@ -2695,8 +2704,8 @@ WARM_2:
 #ifdef HW_FC_CTS_TRIS
         bcf     HW_FC_CTS_TRIS, HW_FC_CTS_PIN, A
 #endif
-        rcall   RQ
-        rcall   VER
+;        rcall   RQ
+;        rcall   VER
         
         rcall   TURNKEY
         call    ZEROSENSE
@@ -2959,6 +2968,9 @@ SPFETCH:
         db      NFA|3,"sp!"
 SPSTORE:
         movf    Sminus, W
+#ifdef K42
+        andlw   high(RAM_MASK)
+#endif
         movwf   Tp
         movf    Sminus, W, A 
         movwf   Sp, A
@@ -2973,7 +2985,12 @@ SPSTORE:
 ;link   set     $
         db      NFA|3,"rp0"
 RPEMPTY:
-        lfsr    Rptr, urbuf
+        ;lfsr    Rptr, urbuf
+        movlw   low(urbuf)
+        movwf   Rp
+        movlw   high(urbuf)
+        movwf   Rbank
+
         movf    TOSH, W
         movwf   PCLATH    ; Save the return address
         movf    TOSL, W, A
