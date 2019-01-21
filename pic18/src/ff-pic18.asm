@@ -1935,10 +1935,16 @@ IFLUSH:
 L_MSET:
         db      NFA|4,"mset"
 MSET:
-        movf    Sminus, W
 #ifdef K42
+        movlw   high(SFR_LO)
+        cpfslt  Srw, A
+        bra     MSET1
+        movlw   high(RAM_MASK)
+        andwf   Srw, F
         andlw   high(RAM_MASK)
+MSET1:
 #endif
+        movf    Sminus, W
         movwf   Tbank
         movf    Sminus, W
         movwf   Tp
@@ -1954,10 +1960,16 @@ MSET:
 L_MCLR:
         db      NFA|4,"mclr"
 MCLR_:
-        movf    Sminus, W
 #ifdef K42
+        movlw   high(SFR_LO)
+        cpfslt  Srw, A
+        bra     MCLR1
+        movlw   high(RAM_MASK)
+        andwf   Srw, F
         andlw   high(RAM_MASK)
 #endif
+MCLR1:
+        movf    Sminus, W
         movwf   Tbank
         movf    Sminus, W
         movwf   Tp
