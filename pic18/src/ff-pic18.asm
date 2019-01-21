@@ -1218,6 +1218,9 @@ SKIP:
         movf    Sminus, W, A
         movwf   PCLATH, A       ; count_lo
         movf    Sminus, W
+#ifdef K42
+        andlw   high(RAM_MASK)
+#endif
         movwf   Tbank
         movf    Sminus, W
         movwf   Tp              ; c-addr
@@ -1268,6 +1271,9 @@ SCAN:
         movwf   PCLATH, A
         bz      SCAN4
         movf    Sminus, W
+#ifdef K42
+        andlw   high(RAM_MASK)
+#endif
         movwf   Tbank
         movf    Sminus, W
         movwf   Tp          ; c-addr
@@ -1920,13 +1926,54 @@ IFLUSH:
         bra     write_buffer_to_imem
         return
 
+; *********************************************
+; Bit masking 8 bits, only for ram addresses !
+; : mset ( mask addr -- )
+;   dup >r c@ swap or r> c!
+; ;
+        dw      L_IFLUSH
+L_MSET:
+        db      NFA|4,"mset"
+MSET:
+        movf    Sminus, W
+#ifdef K42
+        andlw   high(RAM_MASK)
+#endif
+        movwf   Tbank
+        movf    Sminus, W
+        movwf   Tp
+        movf    Sminus, W, A
+        movf    Sminus, W, A
+        iorwf   Trw, F, A
+        return
+        
+; : mclr  ( mask addr -- )
+;  dup >r c@ swap invert and r> c!
+; ;
+        dw      L_MSET
+L_MCLR:
+        db      NFA|4,"mclr"
+MCLR_:
+        movf    Sminus, W
+#ifdef K42
+        andlw   high(RAM_MASK)
+#endif
+        movwf   Tbank
+        movf    Sminus, W
+        movwf   Tp
+        movf    Sminus, W, A
+        comf    Srw, F, A
+        movf    Sminus, W, A
+        andwf   Trw, F, A
+        return
+
 ; Print restart reason
 RQ:
         call    CR
 RQ_DIVZERO:
         btfss   2, 0, A
         bra     RQ_STKFUL
-        call   XSQUOTE
+        rcall   XSQUOTE
         db      d'1',"M"
         rcall   TYPE
 RQ_STKFUL:
@@ -1936,7 +1983,7 @@ RQ_STKFUL:
         btfss   1, STKOVF, A
 #endif
         bra     RQ_STKUNF
-        call   XSQUOTE
+        rcall   XSQUOTE
         db      d'1',"O"
         rcall   TYPE
 RQ_STKUNF:
@@ -1946,7 +1993,7 @@ RQ_STKUNF:
         btfss   1, STKUNF, A
 #endif 
         bra     RQ_BOR
-        call    XSQUOTE
+        rcall   XSQUOTE
         db      d'1',"U"
         rcall   TYPE
 RQ_BOR:
@@ -1978,40 +2025,6 @@ RQ_RI:
         db      d'1',"S"
         rcall   TYPE
 RQ_END:
-        return
-; *********************************************
-; Bit masking 8 bits, only for ram addresses !
-; : mset ( mask addr -- )
-;   dup >r c@ swap or r> c!
-; ;
-        dw      L_IFLUSH
-L_MSET:
-        db      NFA|4,"mset"
-MSET:
-        movf    Sminus, W
-        movwf   Tbank
-        movf    Sminus, W
-        movwf   Tp
-        movf    Sminus, W, A
-        movf    Sminus, W, A
-        iorwf   Trw, F, A
-        return
-        
-; : mclr  ( mask addr -- )
-;  dup >r c@ swap invert and r> c!
-; ;
-        dw      L_MSET
-L_MCLR:
-        db      NFA|4,"mclr"
-MCLR_:
-        movf    Sminus, W
-        movwf   Tbank
-        movf    Sminus, W
-        movwf   Tp
-        movf    Sminus, W, A
-        comf    Srw, F, A
-        movf    Sminus, W, A
-        andwf   Trw, F, A
         return
 
 ; : mtst ( mask addr -- flag )
@@ -2704,8 +2717,8 @@ WARM_2:
 #ifdef HW_FC_CTS_TRIS
         bcf     HW_FC_CTS_TRIS, HW_FC_CTS_PIN, A
 #endif
-;        rcall   RQ
-;        rcall   VER
+        rcall   RQ
+        rcall   VER
         
         rcall   TURNKEY
         call    ZEROSENSE
