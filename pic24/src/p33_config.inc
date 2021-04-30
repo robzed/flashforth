@@ -13,23 +13,25 @@
 
 ;; Check the configuration for your particular chip from the datasheet.
 ;config __FOSCSEL, IESO_ON & FNOSC_FRC
-;config __FOSCSEL, IESO_ON & FNOSC_FRCPLL
-config __FOSCSEL, IESO_ON & FNOSC_PRI
-config __FOSC, FCKSM_CSECMD & IOL1WAY_OFF & OSCIOFNC_OFF & POSCMD_HS
-;config __FOSC, FCKSM_CSECMD & IOL1WAY_OFF & OSCIOFNC_OFF & POSCMD_NONE
+config __FOSCSEL, IESO_ON & FNOSC_FRCPLL
+;config __FOSCSEL, IESO_ON & FNOSC_PRI
+;config __FOSC, FCKSM_CSECMD & IOL1WAY_OFF & OSCIOFNC_OFF & POSCMD_HS
+config __FOSC, FCKSM_CSECMD & IOL1WAY_OFF & OSCIOFNC_OFF & POSCMD_NONE
 config __FWDT, WDTPOST_PS1024
 ;config FPOR,
 ;config FICD, ICS_PGD3
+
+.equ USB_CDC, 0
 
 .equ PLL_DIV, 30              ; Fcy is 27637 KHz (FRC_PLL)
 .equ PLL_FBD, PLL_DIV-2
 .equ PLL_POST, 2              ; Do not change
 .equ PLL_PRE, 2               ; Do not change
 .equ FREQ_FIN, 7372800        ; PLL input frequency.
-;.equ FREQ_OSC, ( FREQ_FIN*PLL_DIV/PLL_PRE/PLL_POST )  ; PLL output frequency. Used with FRCPLL
+.equ FREQ_OSC, ( FREQ_FIN*PLL_DIV/PLL_PRE/PLL_POST )  ; PLL output frequency. Used with FRCPLL
 
 ;.equ  FREQ_OSC, 7370000        ; Used with FNOSC_FRC POSCMD_NONE
-.equ  FREQ_OSC, 15000000       ; Used with FNOSC_PRI POSCMD_HS/XT and external XTAL
+;.equ  FREQ_OSC, 15000000       ; Used with FNOSC_PRI POSCMD_HS/XT and external XTAL
 
 ; Define the UART used for the operator
 .equ OPERATOR_UART, 1        ; 1 or 2
@@ -121,7 +123,7 @@ config __FWDT, WDTPOST_PS1024
 
 ; Include the 32-bit float number support
 ; Load also pic24/forth/float.txt
-.equ FLOATS, 0
+.equ FLOATS, 1
 
 ; Set to 1 to allow control-o to reset FlashForth
 .equ CTRL_O_WARM_RESET, 1
