@@ -20,3 +20,19 @@
 /FF_UART_K42.X/dist/
 /pic18/FF_UART_K42_K83.X/build/
 /pic18/FF_UART_K42_K83.X/dist/
+/pic24/StarFire_Forth.X/build/
+/pic24/StarFire_Forth.X/dist/
+
+# ignore Sloeber project (for now)
+StarFire_Forth.X
+
+# ignore pyc files
+*.pyc
+
+# ignore Mac files
+.DS_Store
+
+# Ignore editor files
+*~
+*.swp
+
