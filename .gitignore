@@ -36,3 +36,7 @@ StarFire_Forth.X
 *~
 *.swp
 
+# Ignore PyDev project for now
+shell/.project
+shell/.pydevproject
+
